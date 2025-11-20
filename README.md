@@ -23,7 +23,6 @@ openface |>
   geom_point(aes(x, y), size = 3.5) +
   geom_text(aes(x, y, label = landmark), 
             color = "white", 
-            #family = "Atkinson Hyperlegible Bold", 
             vjust = 0.45, 
             size = 1.8, 
             hjust = .5) +
