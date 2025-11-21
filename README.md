@@ -32,3 +32,48 @@ openface |>
 The code above will generate something like:
 
 ![](openface_landmarks.png)
+
+
+## Mediapipe landmarks
+
+Under `data/`, there is a `.csv` file that contains basic coordinates and indices of [Mediapipe landmarks]([https://openface-api.readthedocs.io/en/latest/openface.html](https://ai.google.dev/edge/mediapipe/solutions/vision/pose_landmarker)) that can be used to plot a schematic image of the output of Mediapipe pose estimation. 
+
+For example, the following code can be used to plot all landmarks with their corresponding indices and connected into groups (with some tinkering to join the correct shapes):
+
+```r
+library(tidyverse)
+
+mp_landmarks <- 
+  read_csv("https://raw.githubusercontent.com/borstell/computer_vision/refs/heads/main/data/mediapipe_landmarks.csv")
+
+mp_landmarks |> 
+  ggplot() +
+  geom_point(aes(x, y), size = 3) +
+  geom_path(data = \(x) filter(x, landmark %in% c(11, 13, 15)),
+            aes(x, y)) +
+  geom_path(data = \(x) filter(x, landmark %in% c(12, 14, 16)),
+            aes(x, y)) +
+  geom_path(data = \(x) filter(x, landmark %in% c(23, 25, 27, 29, 31)),
+            aes(x, y)) +
+  geom_path(data = \(x) filter(x, landmark %in% c(24, 26, 28, 30, 32)),
+            aes(x, y)) +
+  geom_segment(data = \(x) filter(x, landmark %in% c(15, 17, 19, 21)),
+            aes(x = min(x), y = max(y), xend = x, yend = y)) +
+  geom_segment(data = \(x) filter(x, landmark %in% c(16, 18, 20, 22)),
+               aes(x = max(x), y = max(y), xend = x, yend = y)) +
+  geom_path(data = \(x) filter(x, landmark %in% c(0, 2, 5, 7, 8)) |> arrange(x),
+               aes(x, y)) +
+  geom_path(data = \(x) filter(x, region == "mouth"),
+            aes(x, y)) +
+  geom_polygon(data = \(x) filter(x, region == "torso") |> arrange(x),
+               aes(x, y), fill = NA, color = "black") +
+  geom_text(aes(x, y, label = landmark), size = 1.8, color = "white") +
+  scale_y_reverse() +
+  coord_equal() +
+  theme_void(paper = "white")
+```
+
+
+The code above will generate something like:
+
+![](mediapipe_landmarks.png)
